@@ -50,8 +50,8 @@ butPin = 11        #input: activates the installation
 readyLed = 12      #light to tell you when the program is running
 activatePin = 13   #output: activates the robots
 
-oscRemoteIP = "224.0.1.3"
-oscRemotePort = 54321
+oscRemoteIP = "192.168.2.13"
+oscRemotePort = 8090
 
 
 GPIO.setwarnings(False)
@@ -69,6 +69,7 @@ GPIO.setwarnings(False)
 client = SimpleUDPClient(oscRemoteIP, oscRemotePort)
 client._sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
+multiClient = 
 #code-------------------------------------------------------------------
 
 # #call functions when state changes are detected on buttons
