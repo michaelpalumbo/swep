@@ -50,8 +50,8 @@ butPin = 11        #input: activates the installation
 readyLed = 12      #light to tell you when the program is running
 activatePin = 13   #output: activates the robots
 
-oscRemoteIP = "192.168.2.13"
-oscRemotePort = 8090
+oscRemoteIP = "224.0.1.3"
+oscRemotePort = 7570
 
 
 GPIO.setwarnings(False)
@@ -106,7 +106,7 @@ try:
 
         # Send one osc message and receive exactly one osc message (blocking)
         print ('button pressed!')
-        client.send_message("/robot/active", '!')
+        client.send_message("/robot/active", 'start')
         time.sleep(0.5)
         client.send_message("/robot/active", '?')
         GPIO.output(activatePin, GPIO.LOW) #return back to the "not pressed" state after robots have been activated
