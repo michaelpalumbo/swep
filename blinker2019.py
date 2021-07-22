@@ -56,14 +56,14 @@ oscRemotePort = 54321
 
 GPIO.setwarnings(False)
 
-GPIO.setmode(GPIO.BOARD)          # this determines what GPIO mode we are in
-GPIO.setup(readyLed, GPIO.OUT)    #led lights when installation is "ready"
-GPIO.setup(activatePin, GPIO.OUT) #sends robot signal
+# GPIO.setmode(GPIO.BOARD)          # this determines what GPIO mode we are in
+# GPIO.setup(readyLed, GPIO.OUT)    #led lights when installation is "ready"
+# GPIO.setup(activatePin, GPIO.OUT) #sends robot signal
 
-# all buttons are pulled up, active low
-GPIO.setup(shutdownPiButton, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # connected to Log Out button
-GPIO.setup(exitProgramButton, GPIO.IN, pull_up_down=GPIO.PUD_UP) # push this "kill" button to use the Pi like normal
-GPIO.setup(butPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)            # connected to installation button and "test"
+# # all buttons are pulled up, active low
+# GPIO.setup(shutdownPiButton, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # connected to Log Out button
+# GPIO.setup(exitProgramButton, GPIO.IN, pull_up_down=GPIO.PUD_UP) # push this "kill" button to use the Pi like normal
+# GPIO.setup(butPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)            # connected to installation button and "test"
 
 #wireless osc setup
 client = SimpleUDPClient(oscRemoteIP, oscRemotePort)
@@ -71,9 +71,9 @@ client._sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
 #code-------------------------------------------------------------------
 
-#call functions when state changes are detected on buttons
-GPIO.add_event_detect(shutdownPiButton, GPIO.FALLING, callback=shutdown, bouncetime=1500)     #powerdown function
-GPIO.add_event_detect(exitProgramButton, GPIO.FALLING, callback=exitProgram, bouncetime=1000) #killprogram function
+# #call functions when state changes are detected on buttons
+# GPIO.add_event_detect(shutdownPiButton, GPIO.FALLING, callback=shutdown, bouncetime=1500)     #powerdown function
+# GPIO.add_event_detect(exitProgramButton, GPIO.FALLING, callback=exitProgram, bouncetime=1000) #killprogram function
 
 #what time is it
 time_stamp = time.time()
