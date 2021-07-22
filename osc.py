@@ -6,7 +6,7 @@ from osc4py3 import oscbuildparse
 osc_startup()
 
 # Make client channels to send packets.
-osc_udp_client("224.0.0.1", 7570, "aclientname")
+osc_multicast_client("224.0.0.1", 7570, "aclientname")
 
 # Build a simple message and send it.
 msg = oscbuildparse.OSCMessage("/test/me", ",sif", ["text", 672, 8.871])

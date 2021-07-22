@@ -19,9 +19,18 @@ import subprocess
 import sys
 import socket
 
-# format messages for OSC
-from osc4py3.oscbuildparse import OSCMessage
-from osc4py3.oscbuildparse import encode_packet
+# This library encodes python values into OSC, and also provides our multicast client
+#### NOTE: see lines 29-33 of osc.py in the michaelpalumbo/swep repo for an event loop that might need to be added if there are issues. 
+from osc4py3.as_eventloop import *
+from osc4py3 import oscbuildparse
+
+# Start OSC
+osc_startup()
+
+# Make a multicast client to send to robots
+osc_udp_client("224.0.0.1", 7570, "blinker")
+
+
 #Functions for shutting down pi or killing program---------------------------
 def shutdown(shutdownPiButton):
   time.sleep(.2)
@@ -48,73 +57,61 @@ butPin = 11        #input: activates the installation
 readyLed = 12      #light to tell you when the program is running
 activatePin = 13   #output: activates the robots
 
-oscRemoteIP = "224.0.0.1"
-oscRemotePort = 7570
+GPIO.setmode(GPIO.BOARD)          # this determines what GPIO mode we are in
+GPIO.setup(readyLed, GPIO.OUT)    #led lights when installation is "ready"
+GPIO.setup(activatePin, GPIO.OUT) #sends robot signal
 
-###
-# GPIO.setmode(GPIO.BOARD)          # this determines what GPIO mode we are in
-# GPIO.setup(readyLed, GPIO.OUT)    #led lights when installation is "ready"
-# GPIO.setup(activatePin, GPIO.OUT) #sends robot signal
-###
-# # all buttons are pulled up, active low
-# GPIO.setup(shutdownPiButton, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # connected to Log Out button
-# GPIO.setup(exitProgramButton, GPIO.IN, pull_up_down=GPIO.PUD_UP) # push this "kill" button to use the Pi like normal
-# GPIO.setup(butPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)            # connected to installation button and "test"
-
-#wireless osc setup
-client = SimpleUDPClient(oscRemoteIP, oscRemotePort)
-client._sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+# all buttons are pulled up, active low
+GPIO.setup(shutdownPiButton, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # connected to Log Out button
+GPIO.setup(exitProgramButton, GPIO.IN, pull_up_down=GPIO.PUD_UP) # push this "kill" button to use the Pi like normal
+GPIO.setup(butPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)            # connected to installation button and "test"
 
 #code-------------------------------------------------------------------
-###
-# #call functions when state changes are detected on buttons
-# GPIO.add_event_detect(shutdownPiButton, GPIO.FALLING, callback=shutdown, bouncetime=1500)     #powerdown function
-# GPIO.add_event_detect(exitProgramButton, GPIO.FALLING, callback=exitProgram, bouncetime=1000) #killprogram function
+
+#call functions when state changes are detected on buttons
+GPIO.add_event_detect(shutdownPiButton, GPIO.FALLING, callback=shutdown, bouncetime=1500)     #powerdown function
+GPIO.add_event_detect(exitProgramButton, GPIO.FALLING, callback=exitProgram, bouncetime=1000) #killprogram function
 
 #what time is it
 time_stamp = time.time()
 
 #dummy value : will make sure that the LED and activate pin are initialized probperly on first run of loop
 prevButtonValue = (-1)
-###
-# GPIO.output(activatePin, GPIO.LOW)  #robots are sleeping, deactivated
-# GPIO.output(readyLed, GPIO.HIGH)    #program is running, waiting for input
-startRobotMsg = OSCMessage('/robot/active', ',s', ['start'])
-raw = encode_packet(startRobotMsg)
-client.send_message(raw)
-time.sleep(0.5)
-# client.send_message("/robot/active", 'yeah')
+GPIO.output(activatePin, GPIO.LOW)  #robots are sleeping, deactivated
+GPIO.output(readyLed, GPIO.HIGH)    #program is running, waiting for input
 
-###
-# try:
-#   while restorePi == 1: #while the program is running normally
-#     buttonValue = GPIO.input(butPin)
+try:
+  while restorePi == 1: #while the program is running normally
+    buttonValue = GPIO.input(butPin)
 
-#     if buttonValue != prevButtonValue:    #button toggled
-#       prevButtonValue = buttonValue       #toggle button state
-#       if not buttonValue:
-#         GPIO.output(readyLed, GPIO.LOW)
-#         GPIO.output(activatePin, GPIO.HIGH) #message robots to begin (detectButton function on Arduinos)
+    if buttonValue != prevButtonValue:    #button toggled
+      prevButtonValue = buttonValue       #toggle button state
+      if not buttonValue:
+        GPIO.output(readyLed, GPIO.LOW)
+        GPIO.output(activatePin, GPIO.HIGH) #message robots to begin (detectButton function on Arduinos)
 
-#         # Send one osc message and receive exactly one osc message (blocking)
-#         print ('button pressed!')
-#         client.send_message("/robot/active", 'start')
-#         time.sleep(0.5)
-#         client.send_message("/robot/active", 'yeah')
-#         GPIO.output(activatePin, GPIO.LOW) #return back to the "not pressed" state after robots have been activated
-#         subprocess.call("omxplayer" + " Laurence2019-test.mov", shell=True)
-#         #omx player can only play one thing at a time anyways so extra button presses don't bother anything.
-#         GPIO.output(readyLed, GPIO.HIGH) #waiting for input once more
+        # Send one osc message and receive exactly one osc message (blocking)
+        print ('button pressed!')
+        # Build the OSC message and send it on multicast.
+        msg = oscbuildparse.OSCMessage("/robot/active", ",s", ["start"])
+        osc_send(msg, "blinker")
 
-# except KeyboardInterrupt:
-#   print ('keyboard interrupt. Now exiting program.') # do this, then clean up GPIO buffers
+        GPIO.output(activatePin, GPIO.LOW) #return back to the "not pressed" state after robots have been activated
+        subprocess.call("omxplayer" + " Laurence2019-test.mov", shell=True)
+        #omx player can only play one thing at a time anyways so extra button presses don't bother anything.
+        GPIO.output(readyLed, GPIO.HIGH) #waiting for input once more
 
-# except OSError as err:
-#   print ('OS error: ', err)
+except KeyboardInterrupt:
+  osc_terminate()
+  print ('keyboard interrupt. Now exiting program.') # do this, then clean up GPIO buffers
 
-# except :
-#   print ('other error or exception occurred: ', sys.exc_info()[0])
+except OSError as err:
+  osc_terminate()
+  print ('OS error: ', err)
 
-# finally:
-#   print ('test')
-  # GPIO.cleanup() # reset GPIO pins before exit
+except :
+  osc_terminate()
+  print ('other error or exception occurred: ', sys.exc_info()[0])
+
+finally:
+  GPIO.cleanup() # reset GPIO pins before exit
