@@ -1,33 +1,39 @@
-#for the pi supply
-from subprocess import call
-
-#for osc support
-from pythonosc.udp_client import SimpleUDPClient
-
-#for the hardware I/O
-import RPi.GPIO as GPIO
-
-import time
-import subprocess
-import sys
 import socket
+import struct
+import sys
 
-#palumbo bootstrap code
-import threading
+message = 'very important data'
+multicast_group = ('224.0.1.3', 7470)
 
-WAIT_SECONDS = 3
+# Create the datagram socket
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
-def spoof():
-    print(time.ctime())
-    threading.Timer(WAIT_SECONDS, spoof).start()
-    
-spoof()
+# Set a timeout so the socket does not block indefinitely when trying
+# to receive data.
+sock.settimeout(0.2)
 
-oscRemoteIP = "255.255.255.255"
-oscRemotePort = 54321
+# Set the time-to-live for messages to 1 so they do not go past the
+# local network segment.
+ttl = struct.pack('b', 1)
+sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
 
+try:
 
-#wireless osc setup
-client = SimpleUDPClient(oscRemoteIP, oscRemotePort)
-client._sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    # Send data to the multicast group
+    print >>sys.stderr, 'sending "%s"' % message
+    sent = sock.sendto(message, multicast_group)
 
+    # Look for responses from all recipients
+    while True:
+        print >>sys.stderr, 'waiting to receive'
+        try:
+            data, server = sock.recvfrom(16)
+        except socket.timeout:
+            print >>sys.stderr, 'timed out, no more responses'
+            break
+        else:
+            print >>sys.stderr, 'received "%s" from %s' % (data, server)
+
+finally:
+    print >>sys.stderr, 'closing socket'
+    sock.close()
