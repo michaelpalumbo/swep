@@ -64,8 +64,8 @@ butPin = 11        #input: activates the installation
 readyLed = 12      #light to tell you when the program is running
 activatePin = 13   #output: activates the robots
 
-oscRemoteIP = "255.255.255.255"
-oscRemotePort = 54321
+# oscRemoteIP = "255.255.255.255"
+# oscRemotePort = 54321
 
 
 GPIO.setwarnings(False)
@@ -80,8 +80,8 @@ GPIO.setwarnings(False)
 # GPIO.setup(butPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)            # connected to installation button and "test"
 
 #wireless osc setup
-client = SimpleUDPClient(oscRemoteIP, oscRemotePort)
-client._sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+# client = SimpleUDPClient(oscRemoteIP, oscRemotePort)
+# client._sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
 #code-------------------------------------------------------------------
 
@@ -102,9 +102,9 @@ WAIT_SECONDS = 3
 
 def spoof():
     print ('button pressed!')
-    client.send_message("/robot/active", '!')
-    time.sleep(0.5)
-    client.send_message("/robot/active", '?')
+    # client.send_message("/robot/active", '!')
+    # time.sleep(0.5)
+    # client.send_message("/robot/active", '?')
     # Send data to the multicast group
     # print >>sys.stderr, 'sending "%s"' % message
     sent = sock.sendto(message, multicast_group)
