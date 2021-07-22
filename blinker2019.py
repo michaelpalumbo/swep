@@ -111,7 +111,7 @@ def spoof():
 
     # Send data to the multicast group
     # print >>sys.stderr, 'sending "%s"' % message
-    sent = sock.sendto(("/robot/active", '!'), multicast_group)
+      sent = sock.sendto(("/robot/active", '!'), multicast_group)
 
     # Look for responses from all recipients
     while True:
