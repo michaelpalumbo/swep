@@ -80,6 +80,18 @@ prevButtonValue = (-1)
 GPIO.output(activatePin, GPIO.LOW)  #robots are sleeping, deactivated
 GPIO.output(readyLed, GPIO.HIGH)    #program is running, waiting for input
 
+#palumbo bootstrap code part 2
+WAIT_SECONDS = 3
+
+def spoof():
+    print ('button pressed!')
+    client.send_message("/robot/active", '!')
+    time.sleep(0.5)
+    client.send_message("/robot/active", '?')
+    threading.Timer(WAIT_SECONDS, spoof).start()
+    
+spoof()
+
 try:
   while restorePi == 1: #while the program is running normally
     buttonValue = GPIO.input(butPin)
@@ -98,18 +110,6 @@ try:
         subprocess.call("omxplayer" + " Laurence2019-test.mov", shell=True)
         #omx player can only play one thing at a time anyways so extra button presses don't bother anything.
         GPIO.output(readyLed, GPIO.HIGH) #waiting for input once more
-
-#palumbo bootstrap code part 2
-WAIT_SECONDS = 3
-
-def spoof():
-    print ('button pressed!')
-    client.send_message("/robot/active", '!')
-    time.sleep(0.5)
-    client.send_message("/robot/active", '?')
-    threading.Timer(WAIT_SECONDS, spoof).start()
-    
-spoof()
 
 except KeyboardInterrupt:
   print ('keyboard interrupt. Now exiting program.') # do this, then clean up GPIO buffers
