@@ -89,9 +89,9 @@ try:
 
         # Send one osc message and receive exactly one osc message (blocking)
         print ('button pressed!')
-        client.send_message("/robot/active", !)
+        client.send_message("/robot/active", 'start')
         time.sleep(0.5)
-        client.send_message("/robot/active", ?)
+        client.send_message("/robot/active", 'yeah')
         GPIO.output(activatePin, GPIO.LOW) #return back to the "not pressed" state after robots have been activated
         subprocess.call("omxplayer" + " Laurence2019-test.mov", shell=True)
         #omx player can only play one thing at a time anyways so extra button presses don't bother anything.
