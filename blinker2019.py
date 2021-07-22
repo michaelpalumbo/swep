@@ -69,7 +69,6 @@ GPIO.setwarnings(False)
 client = SimpleUDPClient(oscRemoteIP, oscRemotePort)
 client._sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
-multiClient = 
 #code-------------------------------------------------------------------
 
 # #call functions when state changes are detected on buttons
