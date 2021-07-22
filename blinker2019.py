@@ -107,8 +107,8 @@ def spoof():
     client.send_message("/robot/active", '?')
     # Send data to the multicast group
     # print >>sys.stderr, 'sending "%s"' % message
-      sent = sock.sendto(message, multicast_group)
-      threading.Timer(WAIT_SECONDS, spoof).start()
+    sent = sock.sendto(message, multicast_group)
+    threading.Timer(WAIT_SECONDS, spoof).start()
     
     spoof()
 
