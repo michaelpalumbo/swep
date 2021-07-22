@@ -1,39 +1,18 @@
+# Multicast sender
+# Guidance:  https://stackoverflow.com/a/1794373
 import socket
-import struct
-import sys
 
-message = 'very important data'
-multicast_group = ('224.0.1.3', 7470)
+MCAST_GRP = '224.0.1.3'
+MCAST_PORT = 7470
+MESSAGE = b'Hello, Multicast!'
 
-# Create the datagram socket
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+# regarding socket.IP_MULTICAST_TTL
+# ---------------------------------
+# for all packets sent, after two hops on the network the packet will not
+# be re-sent/broadcast (see https://www.tldp.org/HOWTO/Multicast-HOWTO-6.html)
+MULTICAST_TTL = 2
 
-# Set a timeout so the socket does not block indefinitely when trying
-# to receive data.
-sock.settimeout(0.2)
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, MULTICAST_TTL)
 
-# Set the time-to-live for messages to 1 so they do not go past the
-# local network segment.
-ttl = struct.pack('b', 1)
-sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
-
-try:
-
-    # Send data to the multicast group
-    print >>sys.stderr, 'sending "%s"' % message
-    sent = sock.sendto(message, multicast_group)
-
-    # Look for responses from all recipients
-    while True:
-        print >>sys.stderr, 'waiting to receive'
-        try:
-            data, server = sock.recvfrom(16)
-        except socket.timeout:
-            print >>sys.stderr, 'timed out, no more responses'
-            break
-        else:
-            print >>sys.stderr, 'received "%s" from %s' % (data, server)
-
-finally:
-    print >>sys.stderr, 'closing socket'
-    sock.close()
+sock.sendto(MESSAGE, (MCAST_GRP, MCAST_PORT))

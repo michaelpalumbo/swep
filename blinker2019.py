@@ -21,22 +21,8 @@ import socket
 
 #palumbo bootstrap code part 1
 import threading
-import struct
 
-message = 'very important data'
-multicast_group = ('224.0.1.3', 7470)
 
-# Create the datagram socket
-sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-# Set a timeout so the socket does not block indefinitely when trying
-# to receive data.
-sock.settimeout(0.2)
-
-# Set the time-to-live for messages to 1 so they do not go past the
-# local network segment.
-ttl = struct.pack('b', 1)
-sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
 
 #Functions for shutting down pi or killing program---------------------------
 def shutdown(shutdownPiButton):
@@ -64,8 +50,8 @@ butPin = 11        #input: activates the installation
 readyLed = 12      #light to tell you when the program is running
 activatePin = 13   #output: activates the robots
 
-# oscRemoteIP = "255.255.255.255"
-# oscRemotePort = 54321
+oscRemoteIP = "224.0.1.3"
+oscRemotePort = 8090
 
 
 GPIO.setwarnings(False)
@@ -80,8 +66,8 @@ GPIO.setwarnings(False)
 # GPIO.setup(butPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)            # connected to installation button and "test"
 
 #wireless osc setup
-# client = SimpleUDPClient(oscRemoteIP, oscRemotePort)
-# client._sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+client = SimpleUDPClient(oscRemoteIP, oscRemotePort)
+client._sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
 #code-------------------------------------------------------------------
 
@@ -102,15 +88,12 @@ WAIT_SECONDS = 3
 
 def spoof():
     print ('button pressed!')
-    # client.send_message("/robot/active", '!')
-    # time.sleep(0.5)
-    # client.send_message("/robot/active", '?')
-    # Send data to the multicast group
-    # print >>sys.stderr, 'sending "%s"' % message
-    sent = sock.sendto(message, multicast_group)
+    client.send_message("/robot/active", '!')
+    time.sleep(0.5)
+    client.send_message("/robot/active", '?')
     threading.Timer(WAIT_SECONDS, spoof).start()
     
-    spoof()
+spoof()
 
 try:
   while restorePi == 1: #while the program is running normally
