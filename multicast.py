@@ -31,5 +31,3 @@ oscRemotePort = 54321
 client = SimpleUDPClient(oscRemoteIP, oscRemotePort)
 client._sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
-finally:
-  GPIO.cleanup() # reset GPIO pins before exit
