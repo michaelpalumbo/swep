@@ -19,16 +19,10 @@ import subprocess
 import sys
 import socket
 
-#palumbo bootstrap code
+#palumbo bootstrap code part 1
 import threading
 
-WAIT_SECONDS = 3
 
-def spoof():
-    print(time.ctime())
-    threading.Timer(WAIT_SECONDS, spoof).start()
-    
-spoof()
 
 #Functions for shutting down pi or killing program---------------------------
 def shutdown(shutdownPiButton):
@@ -89,7 +83,6 @@ GPIO.output(readyLed, GPIO.HIGH)    #program is running, waiting for input
 try:
   while restorePi == 1: #while the program is running normally
     buttonValue = GPIO.input(butPin)
-
     if buttonValue != prevButtonValue:    #button toggled
       prevButtonValue = buttonValue       #toggle button state
       if not buttonValue:
@@ -105,6 +98,18 @@ try:
         subprocess.call("omxplayer" + " Laurence2019-test.mov", shell=True)
         #omx player can only play one thing at a time anyways so extra button presses don't bother anything.
         GPIO.output(readyLed, GPIO.HIGH) #waiting for input once more
+
+#palumbo bootstrap code part 2
+WAIT_SECONDS = 3
+
+def spoof():
+    print ('button pressed!')
+    client.send_message("/robot/active", '!')
+    time.sleep(0.5)
+    client.send_message("/robot/active", '?')
+    threading.Timer(WAIT_SECONDS, spoof).start()
+    
+spoof()
 
 except KeyboardInterrupt:
   print ('keyboard interrupt. Now exiting program.') # do this, then clean up GPIO buffers
