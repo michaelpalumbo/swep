@@ -21,8 +21,22 @@ import socket
 
 #palumbo bootstrap code part 1
 import threading
+import struct
 
+message = 'very important data'
+multicast_group = ('224.0.1.3', 7470)
 
+# Create the datagram socket
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+# Set a timeout so the socket does not block indefinitely when trying
+# to receive data.
+sock.settimeout(0.2)
+
+# Set the time-to-live for messages to 1 so they do not go past the
+# local network segment.
+ttl = struct.pack('b', 1)
+sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
 
 #Functions for shutting down pi or killing program---------------------------
 def shutdown(shutdownPiButton):
@@ -50,8 +64,8 @@ butPin = 11        #input: activates the installation
 readyLed = 12      #light to tell you when the program is running
 activatePin = 13   #output: activates the robots
 
-oscRemoteIP = "224.0.1.3"
-oscRemotePort = 7570
+oscRemoteIP = "255.255.255.255"
+oscRemotePort = 54321
 
 
 GPIO.setwarnings(False)
@@ -91,6 +105,28 @@ def spoof():
     client.send_message("/robot/active", '!')
     time.sleep(0.5)
     client.send_message("/robot/active", '?')
+
+
+    try:
+
+    # Send data to the multicast group
+    # print >>sys.stderr, 'sending "%s"' % message
+    sent = sock.sendto(("/robot/active", '!'), multicast_group)
+
+    # Look for responses from all recipients
+    while True:
+        print >>sys.stderr, 'waiting to receive'
+        try:
+            data, server = sock.recvfrom(16)
+        except socket.timeout:
+            print >>sys.stderr, 'timed out, no more responses'
+            break
+        else:
+            print >>sys.stderr, 'received "%s" from %s' % (data, server)
+
+finally:
+    print >>sys.stderr, 'closing socket'
+    sock.close()
     threading.Timer(WAIT_SECONDS, spoof).start()
     
 spoof()
