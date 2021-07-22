@@ -51,8 +51,14 @@ readyLed = 12      #light to tell you when the program is running
 activatePin = 13   #output: activates the robots
 
 oscRemoteIP = "224.0.1.3"
-oscRemotePort = 8090
+oscRemotePort = 54321
 
+# multicast bus
+MCAST_GRP = '224.0.1.3'
+MCAST_PORT = 7570
+MULTICAST_TTL = 2
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, MULTICAST_TTL)
 
 GPIO.setwarnings(False)
 
@@ -65,9 +71,10 @@ GPIO.setwarnings(False)
 # GPIO.setup(exitProgramButton, GPIO.IN, pull_up_down=GPIO.PUD_UP) # push this "kill" button to use the Pi like normal
 # GPIO.setup(butPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)            # connected to installation button and "test"
 
+## palumbo: using a multicast-specific sender so commented this out
 #wireless osc setup
-client = SimpleUDPClient(oscRemoteIP, oscRemotePort)
-client._sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+# client = SimpleUDPClient(oscRemoteIP, oscRemotePort)
+# client._sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
 #code-------------------------------------------------------------------
 
@@ -88,9 +95,8 @@ WAIT_SECONDS = 3
 
 def spoof():
     print ('button pressed!')
-    client.send_message("/robot/active", '!')
-    time.sleep(0.5)
-    client.send_message("/robot/active", '?')
+    msg = b'/robot/active start'
+    sock.sendto(msg, (MCAST_GRP, MCAST_PORT))
     threading.Timer(WAIT_SECONDS, spoof).start()
     
 spoof()

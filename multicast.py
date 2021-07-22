@@ -4,7 +4,7 @@ import socket
 
 MCAST_GRP = '224.0.1.3'
 MCAST_PORT = 7570
-MESSAGE = b'Hello, Multicast!'
+MESSAGE = b'/test Hello'
 
 # regarding socket.IP_MULTICAST_TTL
 # ---------------------------------
