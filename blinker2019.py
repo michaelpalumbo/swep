@@ -107,4 +107,5 @@ except :
   print ('other error or exception occurred: ', sys.exc_info()[0])
 
 finally:
+  print ('test')
   # GPIO.cleanup() # reset GPIO pins before exit
