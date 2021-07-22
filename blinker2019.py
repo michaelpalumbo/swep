@@ -80,8 +80,8 @@ time_stamp = time.time()
 
 #dummy value : will make sure that the LED and activate pin are initialized probperly on first run of loop
 prevButtonValue = (-1)
-GPIO.output(activatePin, GPIO.LOW)  #robots are sleeping, deactivated
-GPIO.output(readyLed, GPIO.HIGH)    #program is running, waiting for input
+# GPIO.output(activatePin, GPIO.LOW)  #robots are sleeping, deactivated
+# GPIO.output(readyLed, GPIO.HIGH)    #program is running, waiting for input
 
 #palumbo bootstrap code part 2
 WAIT_SECONDS = 3
