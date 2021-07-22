@@ -79,7 +79,7 @@ prevButtonValue = (-1)
 ###
 # GPIO.output(activatePin, GPIO.LOW)  #robots are sleeping, deactivated
 # GPIO.output(readyLed, GPIO.HIGH)    #program is running, waiting for input
-startRobotMsg = OSCMessage('/robot/active', 's', ['start'])
+startRobotMsg = OSCMessage('/robot/active', ',s', ['start'])
 raw = encode_packet(startRobotMsg)
 client.send_message(raw)
 time.sleep(0.5)
