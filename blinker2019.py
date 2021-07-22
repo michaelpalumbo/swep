@@ -19,6 +19,9 @@ import subprocess
 import sys
 import socket
 
+# format messages for OSC
+from osc4py3.oscbuildparse import OSCMessage
+from osc4py3.oscbuildparse import encode_packet
 #Functions for shutting down pi or killing program---------------------------
 def shutdown(shutdownPiButton):
   time.sleep(.2)
@@ -76,10 +79,11 @@ prevButtonValue = (-1)
 ###
 # GPIO.output(activatePin, GPIO.LOW)  #robots are sleeping, deactivated
 # GPIO.output(readyLed, GPIO.HIGH)    #program is running, waiting for input
-
-client.send_message(b"/robot/active", b'start')
+startRobotMsg = OSCMessage('/robot/active', 's', ['start'])
+raw = encode_packet(startRobotMsg)
+client.send_message(raw)
 time.sleep(0.5)
-client.send_message("/robot/active", 'yeah')
+# client.send_message("/robot/active", 'yeah')
 
 ###
 # try:
