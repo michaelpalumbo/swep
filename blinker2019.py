@@ -54,7 +54,7 @@ activatePin = 13   #output: activates the robots
 # oscRemotePort = 54321
 
 # multicast bus
-MCAST_GRP = '224.0.1.3'
+MCAST_GRP = '224.0.0.1'
 MCAST_PORT = 7570
 MULTICAST_TTL = 2
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)

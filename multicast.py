@@ -2,7 +2,7 @@
 # Guidance:  https://stackoverflow.com/a/1794373
 import socket
 
-MCAST_GRP = '224.0.1.3'
+MCAST_GRP = '224.0.0.1'
 MCAST_PORT = 7570
 MESSAGE = b'/test Hello'
 
