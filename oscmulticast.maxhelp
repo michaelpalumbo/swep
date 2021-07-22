@@ -10,7 +10,7 @@
 		}
 ,
 		"classnamespace" : "box",
-		"rect" : [ 33.0, 217.0, 535.0, 445.0 ],
+		"rect" : [ -1187.0, 981.0, 535.0, 445.0 ],
 		"bglocked" : 0,
 		"openinpresentation" : 0,
 		"default_fontsize" : 12.0,
@@ -202,8 +202,8 @@
 					"numinlets" : 1,
 					"numoutlets" : 2,
 					"outlettype" : [ "list", "list" ],
-					"patching_rect" : [ 30.0, 165.0, 319.0, 22.0 ],
-					"text" : "oscmulticast @group 224.0.1.3 @port 7570"
+					"patching_rect" : [ 30.0, 165.0, 240.0, 22.0 ],
+					"text" : "oscmulticast @group 224.0.0.1 @port 7570"
 				}
 
 			}

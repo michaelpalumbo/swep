@@ -77,7 +77,7 @@ prevButtonValue = (-1)
 # GPIO.output(activatePin, GPIO.LOW)  #robots are sleeping, deactivated
 # GPIO.output(readyLed, GPIO.HIGH)    #program is running, waiting for input
 
-client.send_message("/robot/active", 'start')
+client.send_message("/robot/active", 1)
 time.sleep(0.5)
 client.send_message("/robot/active", 'yeah')
 
