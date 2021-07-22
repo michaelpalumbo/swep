@@ -77,35 +77,40 @@ prevButtonValue = (-1)
 # GPIO.output(activatePin, GPIO.LOW)  #robots are sleeping, deactivated
 # GPIO.output(readyLed, GPIO.HIGH)    #program is running, waiting for input
 
-try:
-  while restorePi == 1: #while the program is running normally
-    buttonValue = GPIO.input(butPin)
+client.send_message("/robot/active", 'start')
+time.sleep(0.5)
+client.send_message("/robot/active", 'yeah')
 
-    if buttonValue != prevButtonValue:    #button toggled
-      prevButtonValue = buttonValue       #toggle button state
-      if not buttonValue:
-        GPIO.output(readyLed, GPIO.LOW)
-        GPIO.output(activatePin, GPIO.HIGH) #message robots to begin (detectButton function on Arduinos)
+###
+# try:
+#   while restorePi == 1: #while the program is running normally
+#     buttonValue = GPIO.input(butPin)
 
-        # Send one osc message and receive exactly one osc message (blocking)
-        print ('button pressed!')
-        client.send_message("/robot/active", 'start')
-        time.sleep(0.5)
-        client.send_message("/robot/active", 'yeah')
-        GPIO.output(activatePin, GPIO.LOW) #return back to the "not pressed" state after robots have been activated
-        subprocess.call("omxplayer" + " Laurence2019-test.mov", shell=True)
-        #omx player can only play one thing at a time anyways so extra button presses don't bother anything.
-        GPIO.output(readyLed, GPIO.HIGH) #waiting for input once more
+#     if buttonValue != prevButtonValue:    #button toggled
+#       prevButtonValue = buttonValue       #toggle button state
+#       if not buttonValue:
+#         GPIO.output(readyLed, GPIO.LOW)
+#         GPIO.output(activatePin, GPIO.HIGH) #message robots to begin (detectButton function on Arduinos)
 
-except KeyboardInterrupt:
-  print ('keyboard interrupt. Now exiting program.') # do this, then clean up GPIO buffers
+#         # Send one osc message and receive exactly one osc message (blocking)
+#         print ('button pressed!')
+#         client.send_message("/robot/active", 'start')
+#         time.sleep(0.5)
+#         client.send_message("/robot/active", 'yeah')
+#         GPIO.output(activatePin, GPIO.LOW) #return back to the "not pressed" state after robots have been activated
+#         subprocess.call("omxplayer" + " Laurence2019-test.mov", shell=True)
+#         #omx player can only play one thing at a time anyways so extra button presses don't bother anything.
+#         GPIO.output(readyLed, GPIO.HIGH) #waiting for input once more
 
-except OSError as err:
-  print ('OS error: ', err)
+# except KeyboardInterrupt:
+#   print ('keyboard interrupt. Now exiting program.') # do this, then clean up GPIO buffers
 
-except :
-  print ('other error or exception occurred: ', sys.exc_info()[0])
+# except OSError as err:
+#   print ('OS error: ', err)
 
-finally:
-  print ('test')
+# except :
+#   print ('other error or exception occurred: ', sys.exc_info()[0])
+
+# finally:
+#   print ('test')
   # GPIO.cleanup() # reset GPIO pins before exit
