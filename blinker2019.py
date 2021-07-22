@@ -53,6 +53,9 @@ activatePin = 13   #output: activates the robots
 oscRemoteIP = "255.255.255.255"
 oscRemotePort = 54321
 
+
+GPIO.setwarnings(False)
+
 GPIO.setmode(GPIO.BOARD)          # this determines what GPIO mode we are in
 GPIO.setup(readyLed, GPIO.OUT)    #led lights when installation is "ready"
 GPIO.setup(activatePin, GPIO.OUT) #sends robot signal
