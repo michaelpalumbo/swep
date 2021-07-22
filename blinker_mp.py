@@ -19,6 +19,11 @@ import subprocess
 import sys
 import socket
 
+#palumbo bootstrap code part 1
+import threading
+
+
+
 #Functions for shutting down pi or killing program---------------------------
 def shutdown(shutdownPiButton):
   time.sleep(.2)
@@ -45,25 +50,34 @@ butPin = 11        #input: activates the installation
 readyLed = 12      #light to tell you when the program is running
 activatePin = 13   #output: activates the robots
 
-oscRemoteIP = "255.255.255.255"
-oscRemotePort = 54321
+# oscRemoteIP = "224.0.1.3"
+# oscRemotePort = 54321
 
-###
+# multicast bus
+MCAST_GRP = '224.0.0.1'
+MCAST_PORT = 7570
+MULTICAST_TTL = 2
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, MULTICAST_TTL)
+
+GPIO.setwarnings(False)
+
 # GPIO.setmode(GPIO.BOARD)          # this determines what GPIO mode we are in
 # GPIO.setup(readyLed, GPIO.OUT)    #led lights when installation is "ready"
 # GPIO.setup(activatePin, GPIO.OUT) #sends robot signal
-###
+
 # # all buttons are pulled up, active low
 # GPIO.setup(shutdownPiButton, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # connected to Log Out button
 # GPIO.setup(exitProgramButton, GPIO.IN, pull_up_down=GPIO.PUD_UP) # push this "kill" button to use the Pi like normal
 # GPIO.setup(butPin, GPIO.IN, pull_up_down=GPIO.PUD_UP)            # connected to installation button and "test"
 
+## palumbo: using a multicast-specific sender so commented this out
 #wireless osc setup
-client = SimpleUDPClient(oscRemoteIP, oscRemotePort)
-client._sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+# client = SimpleUDPClient(oscRemoteIP, oscRemotePort)
+# client._sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
 #code-------------------------------------------------------------------
-###
+
 # #call functions when state changes are detected on buttons
 # GPIO.add_event_detect(shutdownPiButton, GPIO.FALLING, callback=shutdown, bouncetime=1500)     #powerdown function
 # GPIO.add_event_detect(exitProgramButton, GPIO.FALLING, callback=exitProgram, bouncetime=1000) #killprogram function
@@ -73,14 +87,23 @@ time_stamp = time.time()
 
 #dummy value : will make sure that the LED and activate pin are initialized probperly on first run of loop
 prevButtonValue = (-1)
-###
 # GPIO.output(activatePin, GPIO.LOW)  #robots are sleeping, deactivated
 # GPIO.output(readyLed, GPIO.HIGH)    #program is running, waiting for input
+
+#palumbo bootstrap code part 2
+WAIT_SECONDS = 3
+
+def spoof():
+    print ('button pressed!')
+    msg = b'/robot/active start'
+    sock.sendto(msg, (MCAST_GRP, MCAST_PORT))
+    threading.Timer(WAIT_SECONDS, spoof).start()
+    
+spoof()
 
 try:
   while restorePi == 1: #while the program is running normally
     buttonValue = GPIO.input(butPin)
-
     if buttonValue != prevButtonValue:    #button toggled
       prevButtonValue = buttonValue       #toggle button state
       if not buttonValue:
@@ -89,9 +112,9 @@ try:
 
         # Send one osc message and receive exactly one osc message (blocking)
         print ('button pressed!')
-        client.send_message("/robot/active", !)
+        client.send_message("/robot/active", 'start')
         time.sleep(0.5)
-        client.send_message("/robot/active", ?)
+        client.send_message("/robot/active", '?')
         GPIO.output(activatePin, GPIO.LOW) #return back to the "not pressed" state after robots have been activated
         subprocess.call("omxplayer" + " Laurence2019-test.mov", shell=True)
         #omx player can only play one thing at a time anyways so extra button presses don't bother anything.
@@ -107,4 +130,4 @@ except :
   print ('other error or exception occurred: ', sys.exc_info()[0])
 
 finally:
-  # GPIO.cleanup() # reset GPIO pins before exit
+  GPIO.cleanup() # reset GPIO pins before exit
