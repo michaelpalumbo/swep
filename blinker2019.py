@@ -50,8 +50,8 @@ butPin = 11        #input: activates the installation
 readyLed = 12      #light to tell you when the program is running
 activatePin = 13   #output: activates the robots
 
-oscRemoteIP = "224.0.1.3"
-oscRemotePort = 54321
+# oscRemoteIP = "224.0.1.3"
+# oscRemotePort = 54321
 
 # multicast bus
 MCAST_GRP = '224.0.1.3'
