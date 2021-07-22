@@ -19,6 +19,17 @@ import subprocess
 import sys
 import socket
 
+#palumbo bootstrap code
+import threading
+
+WAIT_SECONDS = 3
+
+def spoof():
+    print(time.ctime())
+    threading.Timer(WAIT_SECONDS, spoof).start()
+    
+spoof()
+
 #Functions for shutting down pi or killing program---------------------------
 def shutdown(shutdownPiButton):
   time.sleep(.2)
